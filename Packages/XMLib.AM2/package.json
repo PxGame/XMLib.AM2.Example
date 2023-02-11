@@ -1,0 +1,13 @@
+{
+  "name": "com.peterxiang.xmlib.am2",
+  "version": "0.0.1",
+  "displayName": "XMLib Action Machine 2",
+  "description": "XMLib \u52a8\u4f5c\u6e38\u620f\u5f00\u53d1\u5957\u4ef6 2",
+  "unity": "2021.3",
+  "keywords": [],
+  "author": {
+    "name": "Peter Xiang",
+    "email": "565067150@qq.com",
+    "url": "https://github.com/PxGame"
+  }
+}

@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.peterxiang.xmlib.am2": {
+      "version": "file:XMLib.AM2",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.collab-proxy": {
       "version": "2.0.0",
       "depth": 0,
