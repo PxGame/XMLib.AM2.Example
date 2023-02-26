@@ -1,0 +1,9 @@
+:root {
+    --toggle-background-checkd-color:#204363;
+    --line-color:#0ee77a;
+}
+
+TimelinePanel {
+    flex-grow: 1;
+    flex-direction: column;
+}

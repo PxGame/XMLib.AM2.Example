@@ -1,0 +1,65 @@
+TrackPanel {
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+#left-container {
+    background-color: grey;
+    width: 200px;
+}
+#right-container {
+    flex-grow: 1;
+}
+
+#right-container > #track-container{
+    flex-grow: 1;
+    background-color: greenyellow;
+    margin-right: 14px;
+    margin-bottom: 14px;
+    overflow: scroll;
+}
+
+#right-container > #track-container > #track-content{
+    flex-grow: 1;
+    background-color: green;
+    align-self:flex-start;
+}
+
+#right-container > #track-container > #track-content> #title-container{
+    background-color: red;
+    height: var(--unity-metrics-toolbar-height);
+    width: 100%;
+}
+
+#right-container > #track-container > #track-content > #body-container{
+    flex-grow: 1;
+    background-color: blue;
+    width:auto;
+    align-self: flex-start;
+    overflow:hidden;
+}
+
+
+#right-container > #track-container > #track-content > #body-container > #body-content{
+    background-color: yellow;
+    flex-grow: 1;
+    flex-shrink: 0;    
+    height: 600px;
+    width: 1200px;
+}
+
+
+#right-container > #horizontalbar {
+    position: absolute; 
+    left: 0; 
+    right: 14px;
+    bottom: 0;
+}
+
+#right-container > #verticalbar {
+    position: absolute; 
+    left: auto; 
+    right: 0; 
+    bottom: 14px; 
+    top: var(--unity-metrics-toolbar-height);
+}

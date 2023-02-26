@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.peterxiang.xmlib.am2": {
-      "version": "file:XMLib.AM2",
+      "version": "file:com.peterxiang.xmlib.am2",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}

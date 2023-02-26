@@ -1,0 +1,25 @@
+MenubarPanel{
+}
+
+MenubarPanel > *{
+    margin-left: 1px;
+    min-width: 50px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+#play-toggle {
+    background-image: url("project:Packages/com.peterxiang.xmlib.am2/Editor/Resources/Images/Icons/play.png");
+}
+
+#play-toggle:checked {
+    background-image: url("project:Packages/com.peterxiang.xmlib.am2/Editor/Resources/Images/Icons/pause.png");
+    background-color: var(--toggle-background-checkd-color);
+}
+
+#prev-frame-button{
+    background-image: url("project:Packages/com.peterxiang.xmlib.am2/Editor/Resources/Images/Icons/previous-frame.png");
+}
+
+#next-frame-button{
+    background-image: url("project:Packages/com.peterxiang.xmlib.am2/Editor/Resources/Images/Icons/next-frame.png");
+}
