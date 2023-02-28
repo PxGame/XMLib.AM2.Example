@@ -3,60 +3,86 @@ TrackPanel {
     flex-direction: row;
 }
 
+/* left */
+
 #left-container {
-    background-color: grey;
-    width: 200px;
-}
-#right-container {
-    flex-grow: 1;
+    min-width : 200px;
+    background-color:blueviolet;
 }
 
-#right-container > #track-container{
+
+#head-container{
     flex-grow: 1;
-    background-color: greenyellow;
-    margin-right: 14px;
     margin-bottom: 14px;
-    overflow: scroll;
 }
 
-#right-container > #track-container > #track-content{
+#tool-container{
+    background-color: var(--unity-colors-toolbar-background);
+    height: var(--unity-metrics-toolbar-height);
+}
+
+#head-body-container{
+    overflow:hidden;
+    flex-grow: 1;
+}
+
+#head-body-content{
+    background-color:aqua;
+    flex-grow: 0;
+    flex-shrink: 0; 
+    height: 600px;/*test value*/
+}
+
+/* right */
+
+#right-container {
+    min-width : 200px;
     flex-grow: 1;
     background-color: green;
+}
+
+#track-container{
+    flex-grow: 1;
+    margin-right: 14px;
+    margin-bottom: 14px;
+    overflow:hidden;
+}
+
+#track-content{
+    flex-grow: 1;
     align-self:flex-start;
 }
 
-#right-container > #track-container > #track-content> #title-container{
-    background-color: red;
+#title-container{
+    background-color: var(--unity-colors-toolbar-background);
     height: var(--unity-metrics-toolbar-height);
     width: 100%;
 }
 
-#right-container > #track-container > #track-content > #body-container{
+#track-body-container{
     flex-grow: 1;
-    background-color: blue;
     width:auto;
     align-self: flex-start;
     overflow:hidden;
 }
 
 
-#right-container > #track-container > #track-content > #body-container > #body-content{
+#track-body-content{
     background-color: yellow;
-    flex-grow: 1;
+    flex-grow: 0;
     flex-shrink: 0;    
-    height: 600px;
-    width: 1200px;
+    height: 600px;/*test value*/
+    width: 1200px;/*test value*/
 }
 
-
-#right-container > #horizontalbar {
+#horizontalbar {
     position: absolute; 
     left: 0; 
     right: 14px;
     bottom: 0;
 }
 
-#right-container > #verticalbar {
+#verticalbar {
     position: absolute; 
     left: auto; 
     right: 0; 

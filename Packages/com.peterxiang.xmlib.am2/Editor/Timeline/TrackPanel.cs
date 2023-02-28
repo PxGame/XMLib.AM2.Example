@@ -11,15 +11,23 @@ namespace XMLib.AM2.Timeline
 {
     public class TrackPanel : VisualElement
     {
-        private VisualElement trackContent;
+        private TwoPaneSplitView splitView;
+
         private Scroller horizontalScroller;
         private Scroller verticalScroller;
-        private VisualElement trackContainer;
-        private VisualElement leftContainer;
+
         private VisualElement rightContainer;
+        private VisualElement trackContainer;
+        private VisualElement trackContent;
         private VisualElement titleContainer;
-        private VisualElement bodyContainer;
-        private VisualElement bodyContent;
+        private VisualElement trackBodyContainer;
+        private VisualElement trackBodyContent;
+
+        private VisualElement leftContainer;
+        private VisualElement headContainer;
+        private VisualElement toolContainer;
+        private VisualElement headBodyContainer;
+        private VisualElement headBodyContent;
 
         public Vector2 scrollOffset
         {
@@ -38,9 +46,9 @@ namespace XMLib.AM2.Timeline
             }
         }
 
-        private float scrollableWidth => bodyContent.layout.width - trackContainer.layout.width;
+        private float scrollableWidth => trackBodyContent.layout.width - trackContainer.layout.width;
 
-        private float scrollableHeight => bodyContent.layout.height - bodyContainer.layout.height;
+        private float scrollableHeight => headBodyContent.layout.height - headBodyContainer.layout.height;
 
         public TrackPanel()
         {
@@ -51,22 +59,44 @@ namespace XMLib.AM2.Timeline
         {
             this.LoadStyle("TrackPanel.uss");
 
+            //
+            splitView = new TwoPaneSplitView(0, 200, TwoPaneSplitViewOrientation.Horizontal);
+            this.Add(splitView);
+            //
+            leftContainer = new VisualElement() { name = "left-container" };
+            splitView.Add(leftContainer);
+            //
+            rightContainer = new VisualElement() { name = "right-container" };
+            splitView.Add(rightContainer);
+
             InitLeftComponents();
             InitRightComponents();
         }
 
         private void InitLeftComponents()
         {
-            leftContainer = new VisualElement() { name = "left-container" };
-            this.Add(leftContainer);
+            //
+            headContainer = new VisualElement() { name = "head-container" };
+            leftContainer.Add(headContainer);
+
+            //
+            toolContainer = new VisualElement() { name = "tool-container" };
+            headContainer.Add(toolContainer);
+
+            headBodyContainer = new VisualElement() { name = "head-body-container" };
+            headContainer.Add(headBodyContainer);
+
+            //
+            headBodyContent = new VisualElement() { name = "head-body-content" };
+            headBodyContainer.Add(headBodyContent);
+
+            //
+            headBodyContent.Add(new TrackBackground());
         }
 
         private void InitRightComponents()
         {
-            //main container
-            rightContainer = new VisualElement() { name = "right-container" };
-            this.Add(rightContainer);
-
+            //
             trackContainer = new VisualElement() { name = "track-container" };
             trackContainer.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             rightContainer.Add(trackContainer);
@@ -95,17 +125,17 @@ namespace XMLib.AM2.Timeline
             //
             titleContainer = new VisualElement() { name = "title-container" };
             trackContent.Add(titleContainer);
-            bodyContainer = new VisualElement() { name = "body-container" };
-            trackContent.Add(bodyContainer);
+            trackBodyContainer = new VisualElement() { name = "track-body-container" };
+            trackContent.Add(trackBodyContainer);
 
             //
-            bodyContent = new VisualElement() { name = "body-content" };
-            bodyContainer.Add(bodyContent);
+            trackBodyContent = new VisualElement() { name = "track-body-content" };
+            trackBodyContainer.Add(trackBodyContent);
 
             //
 
-            titleContainer.Add(new TrackBackground());
-            bodyContainer.Add(new TrackBackground());
+            titleContainer.Add(new TrackTitle());
+            trackBodyContent.Add(new TrackBackground());
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)
@@ -119,25 +149,22 @@ namespace XMLib.AM2.Timeline
 
         private void UpdateContentViewTransform()
         {
-            Vector3 position = bodyContent.transform.position;
             Vector2 vector = scrollOffset;
-            if (true)
-            {
-                vector.y += bodyContent.resolvedStyle.top;
-            }
-            position.x = AMEditorUtility.RoundToPixelGrid(0f - vector.x);
-            position.y = AMEditorUtility.RoundToPixelGrid(0f - vector.y);
+            vector.y += headBodyContent.resolvedStyle.top;
+            float x = AMEditorUtility.RoundToPixelGrid(0f - vector.x);
+            float y = AMEditorUtility.RoundToPixelGrid(0f - vector.y);
 
-            trackContent.transform.position = new Vector3(position.x, 0);
-            bodyContent.transform.position = new Vector3(0, position.y);
+            trackContent.transform.position = new Vector3(x, 0);
+            headBodyContent.transform.position = new Vector3(0, y);
+            trackBodyContent.transform.position = new Vector3(0, y);
 
             trackContent.IncrementVersion(VersionChangeType.Repaint);
         }
 
         private void AdjustScrollers()
         {
-            float factor = ((bodyContent.layout.width > 1E-30f) ? (trackContainer.layout.width / bodyContent.layout.width) : 1f);
-            float factor2 = ((bodyContent.layout.height > 1E-30f) ? (bodyContainer.layout.height / bodyContent.layout.height) : 1f);
+            float factor = ((trackBodyContent.layout.width > 1E-30f) ? (trackContainer.layout.width / trackBodyContent.layout.width) : 1f);
+            float factor2 = ((headBodyContent.layout.height > 1E-30f) ? (headContainer.layout.height / headBodyContent.layout.height) : 1f);
             horizontalScroller.Adjust(factor);
             verticalScroller.Adjust(factor2);
         }
@@ -145,8 +172,8 @@ namespace XMLib.AM2.Timeline
         internal void UpdateScrollers(bool displayHorizontal, bool displayVertical)
         {
             AdjustScrollers();
-            horizontalScroller.SetEnabled(bodyContent.layout.width - trackContainer.layout.width > 0f);
-            verticalScroller.SetEnabled(bodyContent.layout.height - bodyContainer.layout.height > 0f);
+            horizontalScroller.SetEnabled(trackBodyContent.layout.width - trackContainer.layout.width > 0f);
+            verticalScroller.SetEnabled(headBodyContent.layout.height - headContainer.layout.height > 0f);
             bool flag = displayHorizontal;
             bool flag2 = displayVertical;
             DisplayStyle displayStyle = ((!flag) ? DisplayStyle.None : DisplayStyle.Flex);
@@ -176,18 +203,10 @@ namespace XMLib.AM2.Timeline
 
     public class TrackTitle : ImmediateModeElement
     {
-        protected override void ImmediateRepaint()
-        {
-        }
-    }
-
-    public class TrackBackground : ImmediateModeElement
-    {
         private static CustomStyleProperty<Color> LineColorProperty = new CustomStyleProperty<Color>("--line-color");
-        private static readonly Color DefaultLineColor = new Color(0f, 0f, 0f, 0.18f);
-        private Color _lineColor = Color.red;
+        private Color _lineColor = Color.gray;
 
-        public TrackBackground()
+        public TrackTitle()
         {
             base.pickingMode = PickingMode.Ignore;
             this.style.position = Position.Absolute;
@@ -234,6 +253,87 @@ namespace XMLib.AM2.Timeline
                 content.tooltip = "Test";
                 var size = GUI.skin.label.CalcSize(content);
                 GUI.Label(new Rect(Vector2.right * currentXPos, size), content);
+            }
+        }
+    }
+
+    public class TrackBackground : ImmediateModeElement
+    {
+        private static CustomStyleProperty<Color> LineColorProperty = new CustomStyleProperty<Color>("--line-color");
+        private Color _lineColor = Color.gray;
+
+        public TrackBackground()
+        {
+            base.pickingMode = PickingMode.Ignore;
+            this.style.position = Position.Absolute;
+            this.StretchToParentSize();
+
+            this.LoadStyle("TimelineBackground.uss");
+
+            RegisterCallback<CustomStyleResolvedEvent>(OnCustomStyleResolved);
+        }
+
+        private void OnCustomStyleResolved(CustomStyleResolvedEvent evt)
+        {
+            Color value = Color.clear;
+            if (customStyle.TryGetValue(LineColorProperty, out value))
+            {
+                _lineColor = value;
+            }
+        }
+
+        protected override void ImmediateRepaint()
+        {
+            AMEditorUtility.ApplyWireMaterialMethod();
+
+            GUIContent content = new GUIContent();
+
+            float currentXPos = layout.xMin;
+            float stepWidth = 100;
+
+            float currentYPos = layout.yMin;
+            float stepHeight = 100;
+
+            while (currentXPos < layout.xMax)
+            {
+                currentXPos += stepWidth;
+
+                GL.Begin(GL.LINES);
+                GL.Color(_lineColor);
+                GL.Vertex(new Vector3(currentXPos, layout.yMin));
+                GL.Vertex(new Vector3(currentXPos, layout.yMax));
+                GL.End();
+            }
+
+            while (currentYPos < layout.yMax)
+            {
+                currentYPos += stepHeight;
+
+                GL.Begin(GL.LINES);
+                GL.Color(_lineColor);
+                GL.Vertex(new Vector3(layout.xMin, currentYPos));
+                GL.Vertex(new Vector3(layout.xMax, currentYPos));
+                GL.End();
+            }
+
+            currentXPos = 0;
+            while (currentXPos < layout.xMax)
+            {
+                currentXPos += stepWidth;
+                content.text = currentXPos.ToString();
+                content.tooltip = "Test";
+                var size = GUI.skin.label.CalcSize(content);
+                GUI.Label(new Rect(Vector2.right * currentXPos, size), content);
+            }
+
+            currentYPos = 0;
+            while (currentYPos < layout.yMax)
+            {
+                currentYPos += stepHeight;
+                content.text = currentYPos.ToString();
+                content.tooltip = "Test";
+                var size = GUI.skin.label.CalcSize(content);
+                GUI.Label(new Rect(Vector2.up * currentYPos, size), content);
             }
         }
     }
