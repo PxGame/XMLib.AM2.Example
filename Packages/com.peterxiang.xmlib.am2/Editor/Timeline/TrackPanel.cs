@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
+using UnityEditor.UIElements;
 
 namespace XMLib.AM2.Timeline
 {
@@ -16,18 +17,18 @@ namespace XMLib.AM2.Timeline
         private Scroller horizontalScroller;
         private Scroller verticalScroller;
 
+        private VisualElement leftContainer;
+        private VisualElement leftContent;
+        private VisualElement toolContainer;
+        private VisualElement trackHeadContainer;
+        private VisualElement trackHeadContent;
+
         private VisualElement rightContainer;
-        private VisualElement trackContainer;
-        private VisualElement trackContent;
+        private VisualElement rightContent;
+        private VisualElement titleTrackBodyContainer;
         private VisualElement titleContainer;
         private VisualElement trackBodyContainer;
         private VisualElement trackBodyContent;
-
-        private VisualElement leftContainer;
-        private VisualElement headContainer;
-        private VisualElement toolContainer;
-        private VisualElement headBodyContainer;
-        private VisualElement headBodyContent;
 
         public Vector2 scrollOffset
         {
@@ -46,9 +47,9 @@ namespace XMLib.AM2.Timeline
             }
         }
 
-        private float scrollableWidth => trackBodyContent.layout.width - trackContainer.layout.width;
+        private float scrollableWidth => trackBodyContent.layout.width - rightContent.layout.width;
 
-        private float scrollableHeight => headBodyContent.layout.height - headBodyContainer.layout.height;
+        private float scrollableHeight => trackHeadContent.layout.height - trackHeadContainer.layout.height;
 
         public TrackPanel()
         {
@@ -71,42 +72,69 @@ namespace XMLib.AM2.Timeline
 
             InitLeftComponents();
             InitRightComponents();
+
+            Test();
         }
+
+        #region Test
+
+        private void Test()
+        {
+            var addbtn = new ToolbarButton(() =>
+            {
+                TrackItem item = new TrackItem()
+                {
+                    head = new TrackHead() { name = "track-head" },
+                    body = new TrackBody() { name = "track-body" }
+                };
+
+                trackHeadContent.Add(item.head);
+                trackBodyContent.Add(item.body);
+
+                UpdateScrollers();
+                UpdateContentViewTransform();
+            })
+            { };
+            addbtn.text = "Add";
+            toolContainer.Add(addbtn);
+        }
+
+        #endregion Test
 
         private void InitLeftComponents()
         {
             //
-            headContainer = new VisualElement() { name = "head-container" };
-            leftContainer.Add(headContainer);
+            leftContent = new VisualElement() { name = "left-content" };
+            leftContainer.Add(leftContent);
 
             //
-            toolContainer = new VisualElement() { name = "tool-container" };
-            headContainer.Add(toolContainer);
+            toolContainer = new Toolbar() { name = "tool-container" };
+            leftContent.Add(toolContainer);
 
-            headBodyContainer = new VisualElement() { name = "head-body-container" };
-            headContainer.Add(headBodyContainer);
-
-            //
-            headBodyContent = new VisualElement() { name = "head-body-content" };
-            headBodyContainer.Add(headBodyContent);
+            trackHeadContainer = new VisualElement() { name = "track-head-container" };
+            leftContent.Add(trackHeadContainer);
 
             //
-            headBodyContent.Add(new TrackBackground());
+            trackHeadContent = new VisualElement() { name = "track-head-content" };
+            trackHeadContainer.Add(trackHeadContent);
+
+            //
+            trackHeadContent.Add(new TrackBackground());
         }
 
         private void InitRightComponents()
         {
             //
-            trackContainer = new VisualElement() { name = "track-container" };
-            trackContainer.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            rightContainer.Add(trackContainer);
+            rightContent = new VisualElement() { name = "right-content" };
+            rightContent.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            rightContainer.Add(rightContent);
 
             horizontalScroller = new Scroller(0, 2.14748365E+09f, t =>
             {
                 scrollOffset = new Vector2(t, scrollOffset.y);
                 UpdateContentViewTransform();
             }, SliderDirection.Horizontal)
-            { name = "horizontalbar" };
+            { name = "horizontal-scroller" };
             rightContainer.Add(horizontalScroller);
 
             verticalScroller = new Scroller(0, 2.14748365E+09f, t =>
@@ -114,19 +142,19 @@ namespace XMLib.AM2.Timeline
                 scrollOffset = new Vector2(scrollOffset.x, t);
                 UpdateContentViewTransform();
             }, SliderDirection.Vertical)
-            { name = "verticalbar" };
+            { name = "vertical-scroller" };
             rightContainer.Add(verticalScroller);
 
             //
-            trackContent = new VisualElement() { name = "track-content" };
-            trackContent.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            trackContainer.Add(trackContent);
+            titleTrackBodyContainer = new VisualElement() { name = "title-track-body-container" };
+            titleTrackBodyContainer.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            rightContent.Add(titleTrackBodyContainer);
 
             //
             titleContainer = new VisualElement() { name = "title-container" };
-            trackContent.Add(titleContainer);
+            titleTrackBodyContainer.Add(titleContainer);
             trackBodyContainer = new VisualElement() { name = "track-body-container" };
-            trackContent.Add(trackBodyContainer);
+            titleTrackBodyContainer.Add(trackBodyContainer);
 
             //
             trackBodyContent = new VisualElement() { name = "track-body-content" };
@@ -142,7 +170,7 @@ namespace XMLib.AM2.Timeline
         {
             if (!(evt.oldRect.size == evt.newRect.size))
             {
-                UpdateScrollers(true, true);
+                UpdateScrollers();
                 UpdateContentViewTransform();
             }
         }
@@ -150,34 +178,32 @@ namespace XMLib.AM2.Timeline
         private void UpdateContentViewTransform()
         {
             Vector2 vector = scrollOffset;
-            vector.y += headBodyContent.resolvedStyle.top;
+            vector.y += trackHeadContent.resolvedStyle.top;
             float x = AMEditorUtility.RoundToPixelGrid(0f - vector.x);
             float y = AMEditorUtility.RoundToPixelGrid(0f - vector.y);
 
-            trackContent.transform.position = new Vector3(x, 0);
-            headBodyContent.transform.position = new Vector3(0, y);
+            titleTrackBodyContainer.transform.position = new Vector3(x, 0);
+            trackHeadContent.transform.position = new Vector3(0, y);
             trackBodyContent.transform.position = new Vector3(0, y);
 
-            trackContent.IncrementVersion(VersionChangeType.Repaint);
+            this.IncrementVersion(VersionChangeType.Repaint);
         }
 
         private void AdjustScrollers()
         {
-            float factor = ((trackBodyContent.layout.width > 1E-30f) ? (trackContainer.layout.width / trackBodyContent.layout.width) : 1f);
-            float factor2 = ((headBodyContent.layout.height > 1E-30f) ? (headContainer.layout.height / headBodyContent.layout.height) : 1f);
+            float factor = ((trackBodyContent.layout.width > 1E-30f) ? (rightContent.layout.width / trackBodyContent.layout.width) : 1f);
+            float factor2 = ((trackHeadContent.layout.height > 1E-30f) ? (leftContent.layout.height / trackHeadContent.layout.height) : 1f);
             horizontalScroller.Adjust(factor);
             verticalScroller.Adjust(factor2);
         }
 
-        internal void UpdateScrollers(bool displayHorizontal, bool displayVertical)
+        internal void UpdateScrollers()
         {
             AdjustScrollers();
-            horizontalScroller.SetEnabled(trackBodyContent.layout.width - trackContainer.layout.width > 0f);
-            verticalScroller.SetEnabled(headBodyContent.layout.height - headContainer.layout.height > 0f);
-            bool flag = displayHorizontal;
-            bool flag2 = displayVertical;
-            DisplayStyle displayStyle = ((!flag) ? DisplayStyle.None : DisplayStyle.Flex);
-            DisplayStyle displayStyle2 = ((!flag2) ? DisplayStyle.None : DisplayStyle.Flex);
+            horizontalScroller.SetEnabled(trackBodyContent.layout.width - rightContent.layout.width > 0f);
+            verticalScroller.SetEnabled(trackHeadContent.layout.height - leftContent.layout.height > 0f);
+            DisplayStyle displayStyle = DisplayStyle.Flex;
+            DisplayStyle displayStyle2 = DisplayStyle.Flex;
             if (displayStyle != horizontalScroller.style.display)
             {
                 horizontalScroller.style.display = displayStyle;
@@ -208,14 +234,106 @@ namespace XMLib.AM2.Timeline
 
         public TrackTitle()
         {
-            base.pickingMode = PickingMode.Ignore;
+            //base.pickingMode = PickingMode.Ignore;
             this.style.position = Position.Absolute;
             this.StretchToParentSize();
 
             this.LoadStyle("TimelineBackground.uss");
 
             RegisterCallback<CustomStyleResolvedEvent>(OnCustomStyleResolved);
+
+            Test();
         }
+
+        #region Test
+
+        private VisualElement cursor;
+
+        private void Test()
+        {
+            cursor = new VisualElement();
+            cursor.pickingMode = PickingMode.Ignore;
+            cursor.style.position = Position.Absolute;
+            cursor.style.height = 16;
+            cursor.style.width = 12;
+            cursor.style.backgroundColor = Color.red;
+            cursor.transform.position = Vector3.zero;
+            this.Add(cursor);
+
+            this.AddManipulator(new TestManipulator());
+        }
+
+        public class TestManipulator : MouseManipulator
+        {
+            private bool _isActive = false;
+
+            public TestManipulator()
+            {
+                base.activators.Add(new ManipulatorActivationFilter
+                {
+                    button = MouseButton.LeftMouse
+                });
+                _isActive = false;
+            }
+
+            protected override void RegisterCallbacksOnTarget()
+            {
+                target.RegisterCallback<MouseDownEvent>(OnMouseDownEvent);
+                target.RegisterCallback<MouseUpEvent>(OnMouseUpEvent);
+                target.RegisterCallback<MouseMoveEvent>(OnMouseMoveEvent);
+            }
+
+            protected override void UnregisterCallbacksFromTarget()
+            {
+                target.UnregisterCallback<MouseDownEvent>(OnMouseDownEvent);
+                target.UnregisterCallback<MouseUpEvent>(OnMouseUpEvent);
+                target.UnregisterCallback<MouseMoveEvent>(OnMouseMoveEvent);
+            }
+
+            private void OnMouseMoveEvent(MouseMoveEvent evt)
+            {
+                if (!_isActive) { return; }
+                Debug.Log("OnMouseMoveEvent");
+
+                var cursor = (target as TrackTitle).cursor;
+                cursor.transform.position = new Vector3(evt.localMousePosition.x, 0, 0);
+
+                evt.StopPropagation();
+            }
+
+            private void OnMouseDownEvent(MouseDownEvent evt)
+            {
+                if (_isActive)
+                {
+                    evt.StopImmediatePropagation();
+                }
+                else if (CanStartManipulation(evt))
+                {
+                    Debug.Log("OnMouseDownEvent");
+                    _isActive = true;
+
+                    target.CaptureMouse();
+
+                    var cursor = (target as TrackTitle).cursor;
+                    cursor.transform.position = new Vector3(evt.localMousePosition.x, 0, 0);
+
+                    evt.StopPropagation();
+                }
+            }
+
+            private void OnMouseUpEvent(MouseUpEvent evt)
+            {
+                if (_isActive && CanStopManipulation(evt))
+                {
+                    Debug.Log("OnMouseUpEvent");
+                    _isActive = false;
+                    target.ReleaseMouse();
+                    evt.StopPropagation();
+                }
+            }
+        }
+
+        #endregion Test
 
         private void OnCustomStyleResolved(CustomStyleResolvedEvent evt)
         {
@@ -336,5 +454,19 @@ namespace XMLib.AM2.Timeline
                 GUI.Label(new Rect(Vector2.up * currentYPos, size), content);
             }
         }
+    }
+
+    public class TrackItem
+    {
+        public TrackHead head;
+        public TrackBody body;
+    }
+
+    public class TrackHead : VisualElement
+    {
+    }
+
+    public class TrackBody : VisualElement
+    {
     }
 }

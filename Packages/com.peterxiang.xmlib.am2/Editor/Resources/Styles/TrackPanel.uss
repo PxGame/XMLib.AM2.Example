@@ -6,86 +6,105 @@ TrackPanel {
 /* left */
 
 #left-container {
-    min-width : 200px;
-    background-color:blueviolet;
+    min-width: 200px;
+    background-color: blueviolet;
 }
 
 
-#head-container{
+#left-content {
     flex-grow: 1;
     margin-bottom: 14px;
 }
 
-#tool-container{
-    background-color: var(--unity-colors-toolbar-background);
+#tool-container {
+    /* background-color: var(--unity-colors-toolbar-background); */
     height: var(--unity-metrics-toolbar-height);
 }
 
-#head-body-container{
-    overflow:hidden;
+#track-head-container {
+    overflow: hidden;
     flex-grow: 1;
 }
 
-#head-body-content{
-    background-color:aqua;
+#track-head-content {
+    background-color: aqua;
     flex-grow: 0;
-    flex-shrink: 0; 
-    height: 600px;/*test value*/
+    flex-shrink: 0;
+    min-height: 600px;
+    /*test value*/
 }
 
 /* right */
 
 #right-container {
-    min-width : 200px;
+    min-width: 200px;
     flex-grow: 1;
     background-color: green;
 }
 
-#track-container{
+#right-content {
     flex-grow: 1;
     margin-right: 14px;
     margin-bottom: 14px;
-    overflow:hidden;
+    overflow: hidden;
 }
 
-#track-content{
+#title-track-body-container {
     flex-grow: 1;
-    align-self:flex-start;
+    align-self: flex-start;
 }
 
-#title-container{
+#title-container {
     background-color: var(--unity-colors-toolbar-background);
     height: var(--unity-metrics-toolbar-height);
     width: 100%;
 }
 
-#track-body-container{
+#track-body-container {
     flex-grow: 1;
-    width:auto;
+    width: auto;
     align-self: flex-start;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 
-#track-body-content{
+#track-body-content {
     background-color: yellow;
     flex-grow: 0;
-    flex-shrink: 0;    
-    height: 600px;/*test value*/
-    width: 1200px;/*test value*/
+    flex-shrink: 0;
+    min-height: 600px;
+    /*test value*/
+    width: 1200px;
+    /*test value*/
 }
 
-#horizontalbar {
-    position: absolute; 
-    left: 0; 
+/* scroller */
+
+#horizontal-scroller {
+    position: absolute;
+    left: 0;
     right: 14px;
     bottom: 0;
 }
 
-#verticalbar {
-    position: absolute; 
-    left: auto; 
-    right: 0; 
-    bottom: 14px; 
+#vertical-scroller {
+    position: absolute;
+    left: auto;
+    right: 0;
+    bottom: 14px;
     top: var(--unity-metrics-toolbar-height);
+}
+
+/* track */
+
+#track-head {
+    height: 30px;
+    background-color:lightslategrey;
+    margin: 1px 0px 1px 2px;
+}
+
+#track-body {
+    height: 30px;
+    background-color: lightslategrey;
+    margin: 1px 2px 1px 0px;
 }
